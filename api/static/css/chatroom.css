@@ -2,27 +2,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  
-  .buttons {
+}
+
+.buttons {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
-  }
-  
-  .join {
+}
+
+.join {
     display: flex;
     flex-direction: row;
     width: 100%;
-  }
-  
-  .create-btn {
+}
+
+.create-btn {
     width: 100%;
-  }
-  
-  .message-box {
+}
+
+.message-box {
     border-color: black;
     border-width: 2px;
     border-style: solid;
@@ -34,29 +34,29 @@
     width: 80vw;
     align-items: stretch;
     margin: 30px auto;
-  }
-  
-  .messages {
+}
+
+.messages {
     overflow-y: auto;
     flex: 1;
-  }
-  
-  .inputs {
+}
+
+.inputs {
     padding: 10px;
     display: flex;
-  }
-  
-  h2 {
+}
+
+h2 {
     text-align: center;
-  }
-  
-  #message {
+}
+
+#message {
     flex: 1;
     padding: 5px 13px;
     border-radius: 6px;
-  }
-  
-  .text {
+}
+
+.text {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -66,23 +66,46 @@
     margin: 5px 10px;
     font-size: 1.125em;
     line-height: 1.5em;
-  }
-  
-  .muted {
+}
+
+.muted {
     font-size: 10px;
     color: darkgray;
-  }
-  
-  .message-title{
+}
+
+.chat-ui-wrap{
+    display: flex;
+    margin: 50px auto 0;
+    width: 80vw;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.message-title {
     color: #333;
     font-size: 3em;
     font-weight: 700;
     line-height: 1.5em;
-    margin: 50px auto 0;
-    width: 80vw;
-  }
+}
 
-  .submit-send{
+.make-a-videocall{
+    padding: 10px 25px;
+    background: #178066;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 1.25em;
+    font-weight: 600;
+    line-height: 1.5em;
+    transition: 0.3s ease-in;
+}
+
+.make-a-videocall:hover{
+    background: #51e5c0;
+    color: #fff;
+    transition: 0.3s ease-in;
+}
+
+.submit-send {
     padding: 2px 50px;
     border-radius: 4px;
     margin-left: 15px;
@@ -90,4 +113,4 @@
     color: #fff;
     border: none;
     font-weight: 500;
-  }
+}

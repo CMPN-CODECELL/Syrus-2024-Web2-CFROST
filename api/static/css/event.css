@@ -1,0 +1,52 @@
+.event-cards-wrap{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 50px 30px;
+    justify-content: center;
+    padding: 80px;
+}
+
+.event-card{
+    width: 30%;
+}
+
+.event-img{
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.event-title{
+    color: #178066;
+    font-size: 1.5em;
+    line-height: 1.5em;
+    font-weight: 700;
+    margin: 15px 0 0;
+}
+
+.event-desc{
+    line-height: 1.5em;
+    color: #333;
+    margin: 8px 0 0;
+}
+
+.event-date{
+    line-height: 1.5em;
+    color: #333;
+    margin: 6px 0 15px;
+    display: flex;
+    align-items: center;
+}
+
+.event-info{
+    color: #51e5c0;
+    margin: 0;
+    transition: 0.3s ease-in;
+    font-weight: 700;
+}
+
+.event-info:hover{
+    color: #178066;
+    transition: 0.3s ease-in;
+}

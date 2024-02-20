@@ -24,11 +24,13 @@
 
 
 
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
-      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
+
+    <script src="https://kit.fontawesome.com/d0c5f1e210.js" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
 
     {% block css %}
     {% endblock css %}
@@ -62,7 +64,7 @@
                                 <a class="nav-link" href="/">Home </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/activity">Activity</a>
+                                <a class="nav-link" href="/activity">Games</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/doctor">Doctors</a>
@@ -93,7 +95,7 @@
 
     {% block body %}
     {% endblock body %}
-    
+
 
     <!-- footer section -->
     <footer class="footer_section">
@@ -198,6 +200,28 @@
     </footer>
     <!-- footer section -->
 
+    <style>
+        .floating-button-mic {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 60px;
+          height: 60px;
+          position: fixed;
+          bottom: 50px;
+          left: 50px;
+          background: #178066;
+          color: white;
+          font-size: 2em;
+          border-radius: 50%;
+          cursor: pointer;
+          border: 2px double #51e5c0;
+        }
+    </style>
+    <div class="floating-button-mic" id="startListening">
+        <i class="fa-solid fa-microphone"></i>
+    </div>
+
 
     <script type="text/javascript" src="{{url_for('static', filename = 'js/jquery-3.4.1.min.js')}}"></script>
     <!-- popper js -->
@@ -216,6 +240,39 @@
     </script>
     {% block js %}
     {% endblock js %}
+
+    <script>
+        document.getElementById('startListening').addEventListener('click', function() {
+            if (annyang) {
+                var commands = {
+                    'home': function() {
+                        window.location.href = '/';
+                    },
+                    'games': function() {
+                        window.location.href = '/activity';
+                    },
+                    'doctor': function() {
+                        window.location.href = '/doctor';
+                    },
+                    'events': function() {
+                        window.location.href = '/events';
+                    },
+                    'contact': function() {
+                        window.location.href = '/contact';
+                    },
+                    'about': function() {
+                        window.location.href = '/about';
+                    }
+                };
+    
+                // Add our commands to annyang
+                annyang.addCommands(commands);
+    
+                // Start listening
+                annyang.start();
+            }
+        });
+    </script>
 </body>
 
 </html>
