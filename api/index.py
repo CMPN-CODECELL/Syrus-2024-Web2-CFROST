@@ -105,6 +105,20 @@ def department():
 def doctor():
     return render_template("doctor.html")
 
+@app.route('/profile')
+def profile():
+    user = getuserdetails(session['invic_email'])
+    session['contact'] = user['contact']
+    return render_template("profile.html", username = session["name"], useremail = session['invic_email'], usercontact = session['contact'])
+
+@app.route('/upload/details')
+def upload_details():
+    return render_template("upload_details.html")
+
+@app.route('/upload/notes')
+def upload_notes():
+    return render_template("upload_notes.html")
+
 
 @app.route("/meeting")
 @login_required
@@ -311,9 +325,6 @@ def getuserdetails(email):
     user = users.find_one({'email' : email})
     return user
 
-
-
-
 def upload_image_to_storage(image):
     if image:
         # Get the image filename
@@ -329,14 +340,14 @@ def upload_image_to_storage(image):
         image_url = blob.public_url
         return image_url
     
-def upload_pdf_to_storage(pdf_file, project_id):
+def upload_pdf_to_storage(pdf_file):
     if pdf_file:
         # Get the PDF filename
         filename = f"{uuid.uuid4()}.pdf"
         # Initialize Firebase Storage bucket
         bucket = storage.bucket()
         # Create a blob object in the storage bucket
-        blob = bucket.blob(f'projects/{project_id}/{filename}')
+        blob = bucket.blob(f'Pdfs/{filename}')
         # Set content type for PDF
         blob.content_type = 'application/pdf'
         # Upload the PDF file to Firebase Storage
@@ -367,6 +378,26 @@ def delete_pdf_from_storage(pdf_url):
         blob = bucket.blob(path)
         # Delete the blob
         blob.delete()
+
+@app.route('/update_game_data', methods=['POST'])
+def update_game_data():
+    data = request.get_json()
+    if data:
+        # Get the game data from the request
+        stats = data.get('stats')
+        game = data.get('game')
+        # Get the user from the request
+        user = session.get('invic_email')
+        # Update the user in the database
+        user = users.find_one({'email': user})
+        if "games" in user:
+            user["games"][game].append(stats)
+            users.update_one({'email': user['email']}, {'$set': {'games': user['games']}})
+        else:
+            user["games"] = {game: [stats]}
+            users.update_one({'email': user['email']}, {'$set': {'games': user['games']}})
+        return jsonify({'message': 'success'})
+    return jsonify({'message': 'failure'})
 
 if __name__ == '__main__':
     app.run(debug=True)

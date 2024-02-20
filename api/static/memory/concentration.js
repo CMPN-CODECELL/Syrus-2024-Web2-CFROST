@@ -144,6 +144,22 @@ function chosenBlock(i, j, id) {
 	 Purpose: Flips the tile when clicked and adds a value
 		  in: id, value
 */
+function formatDate(date) {
+	var day = date.getDate();
+	var month = date.getMonth() + 1; // January is 0!
+	var year = date.getFullYear();
+
+	// Add leading zero if day or month is less than 10
+	if (day < 10) {
+		day = '0' + day;
+	}
+	if (month < 10) {
+		month = '0' + month;
+	}
+
+	return day + '-' + month + '-' + year;
+}
+
 function activate(id, value) {
 	$("#" + id).attr("class", "flipped");
 	$("#" + id).append("<span>" + value + "</span>");
@@ -178,6 +194,19 @@ function scan(guesses) {
 	}
 	if (count === bigBoard * smallBoard) {
 		var nothing = "";
+		fetch('http://127.0.0.1:5000/update_game_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "stats":{
+						"date": formatDate(new Date()), // Format date
+						"guesses": guesses // Send elapsed time in milliseconds
+                    },
+					"game": "memory"
+                })
+            })
 		alert("You made " + guesses / 2 + " guesses!");
 		$("#board").empty(); // Selects the tag and empties all the children associated with the tag
 		$("#board").append("<h2>Loading up A New Level!</h2>");

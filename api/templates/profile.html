@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link href="{{url_for('static', filename = 'css/profile.css')}}" rel="stylesheet" />
+{% endblock css %}
+
+{% block bodyname %}
+<div class="sub_page">
+    {% endblock bodyname %}
+
+    {% block bodyname2 %}
+</div>
+{% endblock bodyname2 %}
+
+
+{% block body %}
+<div class="profile-wrap">
+    <p class="profile-name">Name: {{username}}</p>
+    <p class="profile-email">Email: {{useremail}}</p>
+    <p class="profile-contact">Contact: {{usercontact}}</p>
+    <div class="profile-form-links">
+        <a class="profile-form-link-btn" href="/upload/notes">Upload Notes</a>
+        <a class="profile-form-link-btn" href="/upload/details">Add Family Members</a>
+    </div>
+</div>
+{% endblock body %}
