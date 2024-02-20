@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link href="{{url_for('static', filename = 'css/chatroom.css')}}" rel="stylesheet" />
+{% endblock css %}
+
+{% block bodyname %}
+<div class="sub_page">
+    {% endblock bodyname %}
+
+    {% block bodyname2 %}
+</div>
+{% endblock bodyname2 %}
+
+
+{% block body %}
+
+<p class="message-title">Welcome to Community Chat!!!</p>
+<div class="message-box">
+    
+    <div class="messages" id="messages"></div>
+    <div class="inputs">
+        <input type="text" rows="3" placeholder="Message" name="message" id="message" />
+        <button type="button" class="submit-send" name="send" id="send-btn" onClick="sendMessage()">
+            Send
+        </button>
+    </div>
+</div>
+
+
+
+{% endblock body %}
+
+
+{% block js %}
+<script type="text/javascript">
+    var socketio = io();
+
+    const messages = document.getElementById("messages");
+
+    const createMessage = (name, msg) => {
+        const content = `
+      <div class="text">
+          <span>
+              <strong>${name}</strong>: ${msg}
+          </span>
+          <span class="muted">
+              ${new Date().toLocaleString()}
+          </span>
+      </div>
+      `;
+        messages.innerHTML += content;
+        // Scroll to the bottom
+        messages.scrollTop = messages.scrollHeight;
+    };
+
+    socketio.on("message", (data) => {
+        createMessage(data.name, data.message);
+    });
+
+    const sendMessage = () => {
+        const message = document.getElementById("message");
+        if (message.value == "") return;
+        socketio.emit("message", { data: message.value });
+        message.value = "";
+    };
+</script>
+{% for msg in messages %}
+<script type="text/javascript">
+    createMessage("{{msg.name}}", "{{msg.message}}");
+</script>
+{% endfor %}
+<script>
+    var chatHistory = document.getElementById("messages");
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+</script>
+{% endblock js %}

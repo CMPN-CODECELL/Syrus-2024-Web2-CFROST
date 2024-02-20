@@ -1,0 +1,93 @@
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .join {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+  
+  .create-btn {
+    width: 100%;
+  }
+  
+  .message-box {
+    border-color: black;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 10px;
+    background-color: whitesmoke;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    width: 80vw;
+    align-items: stretch;
+    margin: 30px auto;
+  }
+  
+  .messages {
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  .inputs {
+    padding: 10px;
+    display: flex;
+  }
+  
+  h2 {
+    text-align: center;
+  }
+  
+  #message {
+    flex: 1;
+    padding: 5px 13px;
+    border-radius: 6px;
+  }
+  
+  .text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 5px 10px;
+    font-size: 1.125em;
+    line-height: 1.5em;
+  }
+  
+  .muted {
+    font-size: 10px;
+    color: darkgray;
+  }
+  
+  .message-title{
+    color: #333;
+    font-size: 3em;
+    font-weight: 700;
+    line-height: 1.5em;
+    margin: 50px auto 0;
+    width: 80vw;
+  }
+
+  .submit-send{
+    padding: 2px 50px;
+    border-radius: 4px;
+    margin-left: 15px;
+    background: linear-gradient(326deg, #178066 0%, #51e5c0 74%);
+    color: #fff;
+    border: none;
+    font-weight: 500;
+  }
