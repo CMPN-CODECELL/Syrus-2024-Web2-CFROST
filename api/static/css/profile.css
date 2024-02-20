@@ -1,0 +1,51 @@
+.profile-wrap{
+    width: 1400px;
+    margin: 0 auto;
+    padding: 70px 0;
+}
+
+.profile-form-links{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.profile-form-link-btn{
+    padding: 5px 20px;
+    background: #178066;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1.125em;
+    font-weight: 600;
+    line-height: 1.5em;
+    transition: 0.3s ease-in;
+    border: 1px solid #178066;
+}
+
+.profile-form-link-btn:hover{
+    background: #fff;
+    color: #178066;
+    border: 1px solid #178066;
+    transition: 0.3s ease-in;
+}
+
+.profile-name{
+    font-size: 2em;
+    color: #333;
+    font-weight: 700;
+    line-height: 1.5em;
+}
+
+.profile-email{
+    font-size: 1.25em;
+    color: #333;
+    font-weight: 700;
+    line-height: 1.5em;
+}
+
+.profile-contact{
+    font-size: 1.25em;
+    color: #333;
+    font-weight: 700;
+    line-height: 1.5em;
+}
