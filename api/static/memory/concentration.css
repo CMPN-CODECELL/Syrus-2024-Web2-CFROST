@@ -1,0 +1,80 @@
+/*
+Purpose: Responsible for the main design of the website and its outlook
+
+Author Name: Md. Tanvir Islam
+
+Command to execute: N/A  
+*/
+
+/* Styling for the body */
+
+body {
+	background-color:  #0C090A;
+	font-family: "Times New Roman", cursive, sans-serif;
+	color: aliceblue;
+}
+
+/* Headline styling */
+
+h1 {
+	color: aliceblue;
+	text-shadow: -1px 0 black, 0 2px black, 1px 0 black, 0 -1px black;
+}
+
+/* Responsible for centering the tiles */
+
+.content {
+	width: 500px;
+	margin: auto;
+}
+
+/* Responsible for the div in the title */
+
+.div1 {
+	background-color:  #3D3C3A;
+	border-width: 5px;
+	border-style: solid;
+	margin: 0 auto;
+	text-align: center;
+	width: 500px;
+	border-radius: 12px; /* makes edges smoooooth */
+}
+
+/* Defines the main shape of the playing tiles */
+
+.tile {
+	box-shadow: 2px 2px black;
+	background-color: lightblue;
+	border: 5px solid white;
+	border-radius: 10px;
+	padding: 10px;
+	width: 57px;
+	height: 57px;
+	vertical-align: top;
+	display: inline-block;
+	text-align: center;
+	font-size: 50px;
+	margin:6px;
+
+}
+
+/* When card is clicked flips the card changes the styling */
+
+.flipped {
+	box-shadow: 2px 2px black;
+	background-color: white;
+	border: 5px solid aliceblue;
+	border-radius: 10px;
+	padding: 10px;
+	width: 57px;
+	height: 57px;
+	vertical-align: top;
+	display: inline-block;
+	text-align: center;
+	font-size: 50px;
+	color: black;
+	margin: 6px;
+	/* Animates, rotation is using Y axis for a sideway flip */
+	transform: rotateY(360deg);
+	transition: width 0.4s, background-color 0.5s, transform 0.7s;
+}

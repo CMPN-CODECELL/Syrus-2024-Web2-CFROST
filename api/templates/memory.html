@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf8"/>
+	<title>Memory Game!</title>
+	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename = 'memory/concentration.css')}}">
+	<script type = "text/javascript" src = "{{url_for('static', filename = 'memory/jquery-1.9.0.js')}}"></script>
+	<div class = "div1"><h1>Memory Game</h1></div>
+</head>
+<body>
+	<div class = "content">
+		<h2 id = "title"></h2>
+		<h2 id = "level"></h2>
+		<h2 id = "tries"></h2>
+		<table id="board"></table>
+	</div>
+	<script type="text/javascript" src="{{url_for('static', filename = 'memory/concentration.js')}}"></script>
+</body>
+</html>

@@ -6,10 +6,19 @@ from functools import wraps
 import firebase_admin
 from firebase_admin import credentials, firestore, initialize_app,storage
 import uuid
-
+import sudoku
 from flask_socketio import join_room, leave_room, send, SocketIO
 import random
 from string import ascii_uppercase
+from flask import json
+import ast
+import functions
+
+secret_word = None
+word_set = None
+to_display = None
+tries = None
+blanks = None
 
 app = Flask(__name__)
 app.secret_key = "ucucgrcgcfucf"
@@ -80,6 +89,10 @@ def home():
 def about():
     return render_template("about.html")
 
+@app.route('/events')
+def event():
+    return render_template("event.html")
+
 @app.route('/contact')
 def contact():
     return render_template("contact.html")
@@ -93,9 +106,17 @@ def doctor():
     return render_template("doctor.html")
 
 
+@app.route("/meeting")
+@login_required
+def meeting():
+    default_room_id = "1111"
+    room_id = request.args.get("roomID", default_room_id)
+    return render_template("meeting.html", username=session["name"], room_id=room_id)
 
 
 
+
+# Chatting
 rooms = {"AAAA": {"members": 0, "messages": []}}
 
 # Chat Room
@@ -114,12 +135,134 @@ def room(code):
     groupcode = code
     session["code"] = code
     user = getuserdetails(session['invic_email'])
-    print(user)
     session["name"] = user["name"]
     if room is None or session["name"] is None or groupcode not in rooms:
         return redirect("/user/login")
 
     return render_template("chatroom.html", code=groupcode, messages=rooms[groupcode]["messages"])
+
+#Games
+@app.route('/game/sudoku/<string:level>')
+def hello(level):
+	# sudokuMatrix = sudokugen.genSudoku()
+	# Create Medium Level Sudoku using Github Sudoku Library https://github.com/JoeKarlsson/Python-Sudoku-Generator-Solver
+	sudokuMatrix = sudoku.main(level)
+	return render_template('sudoku.html', sudokuMatrix=sudokuMatrix)
+
+
+memory_users = {}
+
+@app.route("/game/memory")
+def index():
+	return render_template("memory.html",username="shree"), 200
+
+@app.route("/intro", methods = ["POST"])
+def intro():
+	post_obj = request.json
+	post_obj["board"] = make_board(post_obj["level"])
+	memory_users[post_obj["username"]] = post_obj
+	return json.dumps(post_obj), 200
+
+@app.route("/card", methods = ["POST"])
+def card():
+	post_obj = request.json
+	choice = post_obj["choice"]
+	choice = ast.literal_eval(choice) # converts the str to dict
+	client_name = post_obj["username"]
+	client = memory_users[client_name]
+	client_board = client["board"]
+	info = {}
+	info["value"] = client_board[int(choice["bigBox"])][int(choice["smallerBox"])]
+	info["id"] = choice["id"]
+	return json.dumps(info), 200
+
+
+def make_board(size):
+	double = size * size
+	pool = []
+	pool_two = []
+	board = []
+	for i in range(int(double / 2)):
+		pool.append(i)
+		pool_two.append(i)
+	larger_pool = []
+	for i in range(double):
+		if len(pool) != 0:
+			random_draw = pool[random.randint(0, len(pool) - 1)]
+			pool.remove(random_draw)
+			larger_pool.append(random_draw)
+		elif len(pool) == 1:
+			random_draw = pool[0]
+			pool.remove(random_draw)
+			larger_pool.append(random_draw)
+		if len(pool_two) != 0:
+			random_draw = pool_two[random.randint(0, len(pool_two) - 1)]
+			pool_two.remove(random_draw)
+			larger_pool.append(random_draw)
+		elif len(pool_two) == 1:
+			random_draw = pool_two[0]
+			pool_two.remove(random_draw)
+			larger_pool.append(random_draw)
+
+	for i in range(size):	
+		mini_board = []
+		for j in range(size):
+			mini_board.append(larger_pool[0])
+			larger_pool.remove(larger_pool[0])
+		board.append(mini_board)	
+	return board
+
+@app.route('/game/hangman/<string:level>')
+def game(level):
+	global secret_word
+	global word_set
+	global to_display
+	global tries
+	global blanks	
+	secret_word = functions.get_random_word("dictionary/text" + level + ".txt")
+	word_set = "abcdefghijklmnopqrstuvwxyz"
+	blanks = 0
+	to_display = []
+	for i,char in enumerate(secret_word):
+		if char==" ":
+			to_display.append(" ")
+			
+		else:
+			to_display.append("_")
+			blanks+=1
+
+	tries = 0
+	return render_template('hangman.html',to_display=to_display,word_set=word_set,tries="/static/hangman/img/hangman%d.png"%tries)
+
+
+@app.route('/add_char',methods=["POST"])
+def add_char():
+	global secret_word
+	global word_set
+	global to_display
+	global tries
+	global blanks	
+
+	letter = request.form["letter"]
+	
+	chance_lost = True
+	for i,char in enumerate(secret_word):
+		if char==letter:
+			chance_lost = False
+			to_display[i] = letter
+			blanks-=1
+
+	word_set = word_set.replace(letter,'')
+	print("blanks",blanks)
+	if chance_lost==True:
+		tries += 1
+		if tries==6:
+			return redirect('/game_lost')
+
+	if blanks==0:
+		return redirect('/game_won')
+
+	return render_template('hangman.html',to_display=to_display,word_set=word_set,tries="/static/hangman/img/hangman%d.png"%tries)
 
 @socketio.on("message")
 def message(data):

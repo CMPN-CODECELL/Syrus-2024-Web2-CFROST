@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link href="{{url_for('static', filename = 'css/event.css')}}" rel="stylesheet" />
+{% endblock css %}
+
+{% block bodyname %}
+<div class="sub_page">
+    {% endblock bodyname %}
+
+    {% block bodyname2 %}
+</div>
+{% endblock bodyname2 %}
+
+
+{% block body %}
+    <div class="event-cards-wrap">
+        {% for i in range(10) %}
+        <div class="event-card">
+            <img src="{{url_for('static', filename = 'assets/images/event1.png')}}" class="event-img" alt="">
+            <p class="event-title">Meditation</p>
+            <p class="event-desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi, perspiciatis? Corrupti ipsam quos voluptatibus ab.</p>
+            <p class="event-date"><i class="fa-solid fa-calendar-days"></i> &nbsp; 26/02/2023</p>
+            <a class="event-info" href="">Join Event &nbsp; <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock body %}

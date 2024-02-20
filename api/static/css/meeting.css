@@ -1,0 +1,23 @@
+/* Remove the outline from the video embed */
+#root video {
+    outline: none;
+}
+
+/* Style the "Back to Dashboard" button */
+.back-to-dashboard {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}
+
+.back-to-dashboard button {
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#root{
+    height: 100vh;
+}
