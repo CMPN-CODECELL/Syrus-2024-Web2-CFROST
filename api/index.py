@@ -13,6 +13,11 @@ from string import ascii_uppercase
 from flask import json
 import ast
 import functions
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.offline as pyo
 
 secret_word = None
 word_set = None
@@ -26,7 +31,7 @@ app.secret_key = "ucucgrcgcfucf"
 socketio = SocketIO(app)
 
 cred = credentials.Certificate("./config.json")
-firebase_admin.initialize_app(cred,{"storageBucket": "https://syrus24-7aecd.appspot.com/"})
+firebase_admin.initialize_app(cred,{"storageBucket": "syrus24-7aecd.appspot.com"})
 
 bcrypt = Bcrypt(app)
 uri = "mongodb+srv://shree:shree@cluster0.szpxxnd.mongodb.net/?retryWrites=true&w=majority"
@@ -40,6 +45,33 @@ except Exception as e:
 db = client.test
 users = db.users
 chatroom = db.messages
+
+
+
+# dataset
+df_globe = pd.read_csv("api\\final.csv")
+
+fig_globe = go.Figure(go.Scattergeo(
+    lon=df_globe['longitude'],
+    lat=df_globe['latitude'],
+    mode='markers',
+    marker=dict(
+        size=np.power(df_globe['AlzheimersRatesByCountryPrevalentCases2019'],0.2), color='red',),
+    text=df_globe.apply(lambda row: f"{row['country']} Population: {row['population']}", axis=1)
+))
+
+fig_globe.update_geos(projection_type="orthographic")
+# fig.update_geos(projection_type="mercator")
+fig_globe.update_layout(height=500, width=500, margin={"r":0,"t":0,"l":0,"b":0})
+
+html_file_path_globe = "api/static/graph/globe.html"
+
+pyo.plot(fig_globe, filename=html_file_path_globe, auto_open=False)
+
+# Read the HTML content
+with open(html_file_path_globe, 'r', encoding='utf-8') as file:
+    plot_html_globe = file.read()
+
 
 def login_required(f):
     @wraps(f)
@@ -62,6 +94,8 @@ def login():
         password = bcrypt.check_password_hash(login_user['password'], data['password'])
         if password:
             session['invic_email'] = str(data['email'])
+            session['name'] = login_user['name']
+            session['contact'] = login_user['contact']
             return jsonify({'message' : 'success'})
         else:
             return jsonify({'message' : 'Invalid Password'})
@@ -83,7 +117,7 @@ def register():
 @app.route('/')
 def home():
     
-    return render_template("home.html")
+    return render_template("home.html", plot_html_globe = plot_html_globe)
 
 @app.route('/about')
 def about():
@@ -109,15 +143,103 @@ def doctor():
 def profile():
     user = getuserdetails(session['invic_email'])
     session['contact'] = user['contact']
-    return render_template("profile.html", username = session["name"], useremail = session['invic_email'], usercontact = session['contact'])
+    df_report = pd.DataFrame(columns=['sudoku','hangman','memory','date'])
+    
+    df_report['memory'] = np.random.randint(low=0, high=26, size=30) 
+    df_report['hangman'] = np.random.randint(low=0, high=8, size=30)
+    df_report['sudoku'] = np.random.randint(low=60, high=1201, size=30)
+    df_report['date'] = pd.date_range(start='1/1/2024', periods=30, freq='D')
+    df_report['level'] = np.random.choice(['easy','medium','hard'], 30)
+    
+    fig_sudoku = px.scatter(df_report, x='date', y='sudoku', title='Sudoku Time to Complete', color='level')
+    
+    fig_hangman = px.scatter(df_report, x='date', y='hangman', title='Hangman to Complete', labels={'hangman':'Guesses', 'date':'Date'}, color='level')
+    fig_hangman.add_scatter(x=df_report['date'], y=[6]*len(df_report), name='Threshold')
+    
+    fig_memory = px.scatter(df_report, x='date', y='memory', title='Memory Game Guesses', labels={'memory':'Number of Guesses', 'date':'Date'}, color='level')
 
-@app.route('/upload/details')
+    html_file_path_sudoku = "api/static/graph/sudoku.html"
+    html_file_path_hangman = "api/static/graph/hangman.html"
+    html_file_path_memory = "api/static/graph/memory.html"
+
+    pyo.plot(fig_sudoku, filename=html_file_path_sudoku, auto_open=False)
+    pyo.plot(fig_hangman, filename=html_file_path_hangman, auto_open=False)
+    pyo.plot(fig_memory, filename=html_file_path_memory, auto_open=False)
+
+    # Read the HTML content
+    with open(html_file_path_sudoku, 'r', encoding='utf-8') as file:
+        plot_html_sudoku = file.read()
+    # Read the HTML content
+    with open(html_file_path_hangman, 'r', encoding='utf-8') as file:
+        plot_html_hangman = file.read()
+    # Read the HTML content
+    with open(html_file_path_memory, 'r', encoding='utf-8') as file:
+        plot_html_memory = file.read()
+    
+    return render_template("profile.html", username = session["name"], useremail = session['invic_email'], usercontact = session['contact'], plot_html_sudoku = plot_html_sudoku, 
+                           plot_html_hangman = plot_html_hangman, plot_html_memory = plot_html_memory)
+
+@app.route('/family_details')
+def details():
+    user = getuserdetails(session['invic_email'])
+    return render_template("details.html", members = user['family_members'])
+
+@app.route('/upload/details',methods=['GET','POST'])
 def upload_details():
+    if request.method == 'POST':
+        data = request.form
+        user = getuserdetails(session['invic_email'])
+        image = request.files['image']
+        image_src = upload_image_to_storage(image)
+        member = {
+            'name' : data['name'],
+            'contact' : data['contact'],
+            'relation' : data['relation'],
+            'image': image_src
+        }
+        if user:
+            users.update_one({'email': session['invic_email']}, {'$push': {'family_members': member}})
+            return redirect('/profile')
     return render_template("upload_details.html")
 
-@app.route('/upload/notes')
+@app.route('/notes')
+def notes():
+    user = getuserdetails(session['invic_email'])
+    return render_template("notes.html", notes = user['notes'])
+
+@app.route('/upload/notes',methods=['GET','POST'])
 def upload_notes():
+    if request.method == 'POST':
+        data = request.form
+        user = getuserdetails(session['invic_email'])
+        note = {
+            'title' : data['title'],
+            'description' : data['description']
+        }
+        if user:
+            users.update_one({'email': session['invic_email']}, {'$push': {'notes': note}})
+            return redirect('/profile')
     return render_template("upload_notes.html")
+
+@app.route('/todo')
+def todo():
+    user = getuserdetails(session['invic_email'])
+    return render_template("todo.html", todos = user['todos'])
+
+@app.route('/upload/todo',methods=['GET','POST'])
+def upload_todo():
+    if request.method == 'POST':
+        data = request.form
+        user = getuserdetails(session['invic_email'])
+        todo = {
+            'task' : data['task'],
+            'time' : data['time'],
+            'description' : data['desc']
+        }
+        if user:
+            users.update_one({'email': session['invic_email']}, {'$push': {'todos': todo}})
+            return redirect('/profile')
+    return render_template("upload_todo.html")
 
 
 @app.route("/meeting")
@@ -398,6 +520,13 @@ def update_game_data():
             users.update_one({'email': user['email']}, {'$set': {'games': user['games']}})
         return jsonify({'message': 'success'})
     return jsonify({'message': 'failure'})
+
+@app.route('/logout')
+def logout():
+    session.pop('invic_email', None)
+    session.pop('name', None)
+    session.pop('contact', None)
+    return redirect('/user/login')
 
 if __name__ == '__main__':
     app.run(debug=True)

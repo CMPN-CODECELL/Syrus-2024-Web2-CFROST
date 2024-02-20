@@ -16,16 +16,23 @@
 {% block body %}
 <form method="post" class="edit-form" enctype="multipart/form-data">
 
-    <p class="edit-form-title event-card-edit-title">Add Your Memories</p>
+    <p class="edit-form-title event-card-edit-title">Add a Reminder</p>
 
-    <div class="edit-form-field-wrap-single">
-        <p class="edit-form-field-label">Title</p>
-        <input type="text" name="title" class="edit-form-field-input">
+    <div class="edit-form-row-wrap">
+        <div class="edit-form-field-wrap">
+            <p class="edit-form-field-label">Task</p>
+            <input type="text" name="task" class="edit-form-field-input">
+        </div>
+
+        <div class="edit-form-field-wrap">
+            <p class="edit-form-field-label">Time</p>
+            <input type="time" name="time" class="edit-form-field-input">
+        </div>
     </div>
 
     <div class="edit-form-field-wrap-single">
         <p class="edit-form-field-label">Description</p>
-        <textarea type="text" name="description" class="edit-form-field-input edit-message" rows="8"></textarea>
+        <textarea type="text" name="desc" class="edit-form-field-input edit-message" rows="5"></textarea>
     </div>
     
     <div class="edit-submit-button-wrap">
