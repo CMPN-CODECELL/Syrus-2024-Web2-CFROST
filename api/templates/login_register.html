@@ -249,6 +249,7 @@ input {
         <input type="varchar" name="email" placeholder="Email">
         <input type="password" name="password" placeholder="Password">
         <input type="varchar" name="contact" placeholder="Mobile No.">
+		<input type="varchar" name="address" placeholder="Adddress">
         <button type="submit" name="submit">SignUp</button>
       </form>
     </div>
@@ -317,20 +318,31 @@ input {
         .catch(err => console.log(err));
     }
 
-    function register(e) {
+    async function register(e) {
       e.preventDefault();
       let form = document.getElementById("signUpForm");
       let name = form.querySelector("[name='name']").value;
       let email = form.querySelector("[name='email']").value;
       let password = form.querySelector("[name='password']").value;
       let contact = form.querySelector("[name='contact']").value;
-      let data = {
-        name,
-        email,
-        password,
-        contact
-      };
-      fetch("/register", {
+      let address = form.querySelector("[name='address']").value;
+	  let lat;
+	  let long;
+	  navigator.geolocation.getCurrentPosition(location=>{
+		let lat = location.coords.latitude;
+	    let long = location.coords.longitude;
+		let data = {
+			name,
+			email,
+			password,
+			contact,
+			address,
+			location:{
+				"latitude":lat,
+				"longitude":long
+			}
+		};
+		fetch("/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -346,6 +358,8 @@ input {
           }
         })
         .catch(err => console.log(err));
+	  });
+
     }
 
 

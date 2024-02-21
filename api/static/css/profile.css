@@ -4,14 +4,17 @@
     padding: 70px 0;
 }
 
-.profile-form-links{
-    display: flex;
-    gap: 20px;
+.profile-form-grid{
+    display: grid;
     align-items: center;
+    gap: 40px 60px;
+    grid-template-columns: repeat(4, 1fr);
+    margin-top: 60px;
 }
 
 .profile-form-link-btn{
-    padding: 5px 20px;
+    text-align: center;
+    padding: 5px 0;
     background: #178066;
     border-radius: 5px;
     color: #fff;

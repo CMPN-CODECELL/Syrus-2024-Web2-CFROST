@@ -13,11 +13,16 @@ from string import ascii_uppercase
 from flask import json
 import ast
 import functions
+from functions import generate_problems
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.offline as pyo
+import schedule
+import time
+from plyer import notification 
+import threading
 
 secret_word = None
 word_set = None
@@ -72,6 +77,24 @@ pyo.plot(fig_globe, filename=html_file_path_globe, auto_open=False)
 with open(html_file_path_globe, 'r', encoding='utf-8') as file:
     plot_html_globe = file.read()
 
+def send_notification(title, message):
+    notification.notify(
+        title=title,
+        message=message,
+        timeout=10  # Notification will disappear after 10 seconds
+    )
+
+def schedule_notifications(todo_times, todo_titles, todo_descriptions):
+    for time_, title, desc in zip(todo_times, todo_titles, todo_descriptions):
+        schedule.every().day.at(time_).do(lambda: send_notification(title, desc))
+
+def run_scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(1000)
+        
+scheduler_thread = threading.Thread(target=run_scheduler)
+scheduler_thread.start()
 
 def login_required(f):
     @wraps(f)
@@ -96,10 +119,24 @@ def login():
             session['invic_email'] = str(data['email'])
             session['name'] = login_user['name']
             session['contact'] = login_user['contact']
+            session['address'] = login_user['address']
             return jsonify({'message' : 'success'})
         else:
             return jsonify({'message' : 'Invalid Password'})
     return jsonify({'message' : 'Invalid Email'})
+
+@app.route('/quiz/<int:level>')
+def quiz(level):
+     questions = generate_problems(level)
+     count = len(questions)
+     return render_template('math_quiz.html',questions=questions,count=count)
+
+@app.route('/quiz/submit',methods=['POST'])
+def submitQuiz():
+     if request.method=="POST":
+          data = request.form
+          score = data['score']
+          users.update_one({'email': session['invic_email']}, {'$push': {'quiz_score': score}})
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -108,7 +145,7 @@ def register():
     curr_user = users.find_one({'email' : data['email']})
     if curr_user:
         return jsonify({'message' : 'User already exists'})
-    new_user = users.insert_one({'name' : data['name'], 'email' : data['email'], 'password' : hashed,'contact':data['contact']})
+    new_user = users.insert_one({'name' : data['name'], 'email' : data['email'], 'password' : hashed,'contact':data['contact'],'location':data['location'],'address':data["address"]})
     if(new_user):
         return jsonify({'message' : 'success'})
     else: 
@@ -117,27 +154,27 @@ def register():
 @app.route('/')
 def home():
     
-    return render_template("home.html", plot_html_globe = plot_html_globe)
+    return render_template("home.html", plot_html_globe = plot_html_globe,status=isLogin())
 
 @app.route('/about')
 def about():
-    return render_template("about.html")
+    return render_template("about.html",status=isLogin())
 
 @app.route('/events')
 def event():
-    return render_template("event.html")
+    return render_template("event.html",status=isLogin())
 
 @app.route('/contact')
 def contact():
-    return render_template("contact.html")
+    return render_template("contact.html",status=isLogin())
 
 @app.route('/activity')
 def department():
-    return render_template("activity.html")
+    return render_template("activity.html",status=isLogin())
 
 @app.route('/doctor')
 def doctor():
-    return render_template("doctor.html")
+    return render_template("doctor.html",status=isLogin())
 
 @app.route('/profile')
 def profile():
@@ -148,23 +185,29 @@ def profile():
     df_report['memory'] = np.random.randint(low=0, high=26, size=30) 
     df_report['hangman'] = np.random.randint(low=0, high=8, size=30)
     df_report['sudoku'] = np.random.randint(low=60, high=1201, size=30)
+    df_report['maths'] = np.random.randint(low=0, high=11, size=30)
     df_report['date'] = pd.date_range(start='1/1/2024', periods=30, freq='D')
     df_report['level'] = np.random.choice(['easy','medium','hard'], 30)
     
     fig_sudoku = px.scatter(df_report, x='date', y='sudoku', title='Sudoku Time to Complete', color='level')
     
-    fig_hangman = px.scatter(df_report, x='date', y='hangman', title='Hangman to Complete', labels={'hangman':'Guesses', 'date':'Date'}, color='level')
+    fig_hangman = px.scatter(df_report, x='date', y='hangman', title='Hangman Guesses', labels={'hangman':'Guesses', 'date':'Date'}, color='level')
     fig_hangman.add_scatter(x=df_report['date'], y=[6]*len(df_report), name='Threshold')
+    fig_hangman.add_scatter(x=df_report['date'], y=[np.mean(df_report['hangman'])]*len(df_report), name='Average')
     
     fig_memory = px.scatter(df_report, x='date', y='memory', title='Memory Game Guesses', labels={'memory':'Number of Guesses', 'date':'Date'}, color='level')
+
+    fig_maths = px.scatter(df_report, x='date', y='maths', title='Maths Score', labels={'maths':'Assessment Score', 'date':'Date'}, color='level')
 
     html_file_path_sudoku = "api/static/graph/sudoku.html"
     html_file_path_hangman = "api/static/graph/hangman.html"
     html_file_path_memory = "api/static/graph/memory.html"
+    html_file_path_maths = "api/static/graph/maths.html"
 
     pyo.plot(fig_sudoku, filename=html_file_path_sudoku, auto_open=False)
     pyo.plot(fig_hangman, filename=html_file_path_hangman, auto_open=False)
     pyo.plot(fig_memory, filename=html_file_path_memory, auto_open=False)
+    pyo.plot(fig_maths, filename=html_file_path_maths, auto_open=False)
 
     # Read the HTML content
     with open(html_file_path_sudoku, 'r', encoding='utf-8') as file:
@@ -175,14 +218,18 @@ def profile():
     # Read the HTML content
     with open(html_file_path_memory, 'r', encoding='utf-8') as file:
         plot_html_memory = file.read()
+    # Read the HTML content
+    with open(html_file_path_maths, 'r', encoding='utf-8') as file:
+        plot_html_maths = file.read()
     
-    return render_template("profile.html", username = session["name"], useremail = session['invic_email'], usercontact = session['contact'], plot_html_sudoku = plot_html_sudoku, 
-                           plot_html_hangman = plot_html_hangman, plot_html_memory = plot_html_memory)
+    return render_template("profile.html", username = session["name"], useremail = session['invic_email'], usercontact = session['contact'], 
+                           useraddress = session['address'],plot_html_sudoku = plot_html_sudoku, 
+                           plot_html_hangman = plot_html_hangman, plot_html_memory = plot_html_memory,status=isLogin())
 
 @app.route('/family_details')
 def details():
     user = getuserdetails(session['invic_email'])
-    return render_template("details.html", members = user['family_members'])
+    return render_template("details.html", members = user['family_members'],status=isLogin())
 
 @app.route('/upload/details',methods=['GET','POST'])
 def upload_details():
@@ -200,12 +247,12 @@ def upload_details():
         if user:
             users.update_one({'email': session['invic_email']}, {'$push': {'family_members': member}})
             return redirect('/profile')
-    return render_template("upload_details.html")
+    return render_template("upload_details.html",status=isLogin())
 
 @app.route('/notes')
 def notes():
     user = getuserdetails(session['invic_email'])
-    return render_template("notes.html", notes = user['notes'])
+    return render_template("notes.html", notes = user['notes'],status=isLogin())
 
 @app.route('/upload/notes',methods=['GET','POST'])
 def upload_notes():
@@ -219,11 +266,23 @@ def upload_notes():
         if user:
             users.update_one({'email': session['invic_email']}, {'$push': {'notes': note}})
             return redirect('/profile')
-    return render_template("upload_notes.html")
+    return render_template("upload_notes.html",status=isLogin())
 
 @app.route('/todo')
 def todo():
     user = getuserdetails(session['invic_email'])
+    todos = user['todos']
+    list_todo_title = []
+    list_todo_time = []
+    list_todo_desc = []
+    print(todos)
+    for i in todos:
+        list_todo_time.append(i['time'])
+        list_todo_title.append(i['task'])
+        list_todo_desc.append(i['description'])
+        
+    print(list_todo_time)
+    schedule_notifications(list_todo_time, list_todo_title, list_todo_desc)
     return render_template("todo.html", todos = user['todos'])
 
 @app.route('/upload/todo',methods=['GET','POST'])
@@ -239,15 +298,31 @@ def upload_todo():
         if user:
             users.update_one({'email': session['invic_email']}, {'$push': {'todos': todo}})
             return redirect('/profile')
-    return render_template("upload_todo.html")
+    return render_template("upload_todo.html",status=isLogin())
 
+
+
+@app.route('/upload/report',methods=['GET','POST'])
+def upload_report():
+    if request.method == "POST":
+         data = request.form
+         title = data["title"]
+         pdf_file = request.files["pdf"]
+         pdf_url = upload_pdf_to_storage(pdf_file)
+         report = {
+              "title": title,
+              "file": pdf_url
+         }
+         user = getuserdetails(session["invic_email"])
+         users.update_one({'email': session['invic_email']}, {'$push': {'reports': report}})
+    return render_template("upload_report.html",status=isLogin())
 
 @app.route("/meeting")
 @login_required
 def meeting():
     default_room_id = "1111"
     room_id = request.args.get("roomID", default_room_id)
-    return render_template("meeting.html", username=session["name"], room_id=room_id)
+    return render_template("meeting.html", username=session["name"], room_id=room_id,status=isLogin())
 
 
 
@@ -275,7 +350,7 @@ def room(code):
     if room is None or session["name"] is None or groupcode not in rooms:
         return redirect("/user/login")
 
-    return render_template("chatroom.html", code=groupcode, messages=rooms[groupcode]["messages"])
+    return render_template("chatroom.html", code=groupcode, messages=rooms[groupcode]["messages"],status=isLogin())
 
 #Games
 @app.route('/game/sudoku/<string:level>')
@@ -283,14 +358,14 @@ def hello(level):
 	# sudokuMatrix = sudokugen.genSudoku()
 	# Create Medium Level Sudoku using Github Sudoku Library https://github.com/JoeKarlsson/Python-Sudoku-Generator-Solver
 	sudokuMatrix = sudoku.main(level)
-	return render_template('sudoku.html', sudokuMatrix=sudokuMatrix)
+	return render_template('sudoku.html', sudokuMatrix=sudokuMatrix,status=isLogin())
 
 
 memory_users = {}
 
 @app.route("/game/memory")
 def index():
-	return render_template("memory.html",username="shree"), 200
+	return render_template("memory.html",username="shree",status=isLogin()), 200
 
 @app.route("/intro", methods = ["POST"])
 def intro():
@@ -368,7 +443,7 @@ def game(level):
 			blanks+=1
 
 	tries = 0
-	return render_template('hangman.html',to_display=to_display,word_set=word_set,tries="/static/hangman/img/hangman%d.png"%tries)
+	return render_template('hangman.html',to_display=to_display,word_set=word_set,tries="/static/hangman/img/hangman%d.png"%tries,status=isLogin())
 
 
 @app.route('/add_char',methods=["POST"])
@@ -398,7 +473,13 @@ def add_char():
 	if blanks==0:
 		return redirect('/game_won')
 
-	return render_template('hangman.html',to_display=to_display,word_set=word_set,tries="/static/hangman/img/hangman%d.png"%tries)
+	return render_template('hangman.html',to_display=to_display,word_set=word_set,tries="/static/hangman/img/hangman%d.png"%tries,status=isLogin())
+
+@app.route('/reports')
+def showReport():
+     user = users.find_one({"email":session["invic_email"]})
+     reports = user["reports"]
+     return render_template('report.html',reports=reports)
 
 @socketio.on("message")
 def message(data):
@@ -500,6 +581,12 @@ def delete_pdf_from_storage(pdf_url):
         blob = bucket.blob(path)
         # Delete the blob
         blob.delete()
+
+def isLogin():
+     if 'invic_email' in session:
+          return "login"
+     else:
+          return "required"
 
 @app.route('/update_game_data', methods=['POST'])
 def update_game_data():

@@ -1,0 +1,84 @@
+.hangman-wrap{
+    width: 1000px;
+    margin: 0 auto;
+    padding: 50px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hangman-title{
+    width: 100%;
+    color: #333;
+    font-size: 2.4em;
+    line-height: 1.5em;
+    font-weight: 700;
+    text-align: left;
+}
+
+.text-guess{
+    margin-bottom: 10px;
+}
+
+.text-guess span{
+    font-size: 1.125em;
+    font-weight: 600;
+    line-height: 1.5em;
+    color: #333;
+    margin: 0 5px;
+}
+
+.hangman-form{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    height: 100px;
+    justify-content: center;
+}
+
+.hangman-input-wrap{
+    display: flex;
+    align-items: center;
+}
+
+.hangman-label{
+    color: #333;
+    font-size: 1.2em;
+    line-height: 1.5em;
+    margin-right: 10px;
+    margin-bottom: 0;
+}
+
+.hangman-btn{
+    background: #178066;
+    border: 1px solid #178066;
+    border-radius: 5px;
+    padding: 5px 20px;
+    color: #fff;
+    margin-left: 20px;
+    transition: 0.3s ease-in;
+}
+
+.hangman-btn:hover{
+    background: #fff;
+    color: #178066;
+    transition: 0.3s ease-in;
+}
+
+.hangman-hints-wrap{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    gap: 10px;
+}
+
+.hangman-hints{
+    padding: 5px 0;
+    width: 40px;
+    text-align: center;
+    color: #178066;
+    border: 1px solid #178066;
+    border-radius: 5px;
+}

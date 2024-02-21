@@ -1,18 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{% extends "layout.html" %}
+
+{% block css %}
+<link href="{{url_for('static', filename = 'css/event.css')}}" rel="stylesheet" />
+{% endblock css %}
+
+{% block bodyname %}
+<div class="sub_page">
+    {% endblock bodyname %}
+
+    {% block bodyname2 %}
+</div>
+{% endblock bodyname2 %}
+
+
+{% block body %}
+<div class="event-cards-wrap">
     {% for member in members %}
-    <div>
-        <img src="{{member.image}}" alt="No Image"/>
-    <h1>{{member.name}}</h1>
-    <p>{{member.relation}}</p>
-    <p>{{member.contact}}</p>
+    <div class="event-card">
+        <img src="{{member.image}}" class="event-img" alt="No Image"/>
+        <p class="event-title">Name: {{member.name}}</p>
+        <p class="event-desc">Relation: {{member.relation}}</p>
+        <p class="event-date">Contact: {{member.contact}}</p>
     </div>
     {% endfor %}
-</body>
-</html>
+</div>
+{% endblock body %}

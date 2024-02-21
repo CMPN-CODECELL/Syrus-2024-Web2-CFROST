@@ -1,17 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    {% for todo in todos %}
-    <div>
-    <h1>{{todo.task}}</h1>
-    <p>{{todo.time}}</p>
-    <p>{{todo.description}}</p>
+{% extends "layout.html" %}
+
+{% block css %}
+<link href="{{url_for('static', filename = 'css/todo.css')}}" rel="stylesheet" />
+{% endblock css %}
+
+{% block bodyname %}
+<div class="sub_page">
+    {% endblock bodyname %}
+
+    {% block bodyname2 %}
+</div>
+{% endblock bodyname2 %}
+
+
+{% block body %}
+    <div class="view-todo-wrap">
+        <p class="view-todo-title">View Todo List</p>
+        <div class="view-todo-list-head">
+            <p class="view-task list-head">Task</p>
+            <p class="view-time list-head">Time</p>
+            <p class="view-desc list-head">Description</p>
+        </div>
+        {% for todo in todos %}
+        <div class="view-todo-list">
+        <p class="view-task">{{todo.task}}</p>
+        <p class="view-time">{{todo.time}}</p>
+        <p class="view-desc">{{todo.description}}</p>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</body>
-</html>
+{% endblock body %}
