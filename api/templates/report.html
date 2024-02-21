@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block css %}
-<link href="{{url_for('static', filename = 'css/notes.css')}}" rel="stylesheet" />
+<link href="{{url_for('static', filename = 'css/report.css')}}" rel="stylesheet" />
 {% endblock css %}
 
 {% block bodyname %}
@@ -15,15 +15,15 @@
 
 {% block body %}
 <div class="view-todo-wrap">
-    <p class="view-todo-title">View My Memories (Notes)</p>
+    <p class="view-todo-title">View My Reports</p>
     <div class="view-todo-list-head">
         <p class="view-task list-head">Task</p>
         <p class="view-desc list-head">Description</p>
     </div>
-    {% for note in notes %}
+    {% for report in reports %}
     <div class="view-todo-list">
-    <p class="view-task">{{note.title}}</p>
-    <p class="view-desc">{{note.description}}</p>
+    <p class="view-task">{{report.title}}</p>
+    <a href="{{report.file}}" class="view-desc" target="_blank" >View</a>
     </div>
     {% endfor %}
 </div>

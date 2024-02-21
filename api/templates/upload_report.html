@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link href="{{url_for('static', filename = 'css/upload_details.css')}}" rel="stylesheet" />
+{% endblock css %}
+
+{% block bodyname %}
+<div class="sub_page">
+    {% endblock bodyname %}
+
+    {% block bodyname2 %}
+</div>
+{% endblock bodyname2 %}
+
+
+{% block body %}
+<form method="post" class="edit-form" enctype="multipart/form-data">
+
+    <p class="edit-form-title event-card-edit-title">Upload Report</p>
+
+    <div class="edit-form-field-wrap-single">
+        <p class="edit-form-field-label">Report Name</p>
+        <input type="text" name="title" class="edit-form-field-input">
+    </div>
+
+    <div class="edit-form-field-wrap-single">
+        <p class="edit-form-field-label">PDF</p>
+        <input type="file" name="pdf" class="edit-form-field-input file-input" accept="application/pdf">
+    </div>
+    
+    <div class="edit-submit-button-wrap">
+        <button type="submit" class="edit-submit-button button-shadow">Save Changes</button>
+    </div>
+</form>
+{% endblock body %}

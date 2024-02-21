@@ -1,30 +1,43 @@
- <!DOCTYPE html>
-<html>
-<body>
+{% extends "layout.html" %}
 
-<h1>Hangman</h1>
-<img src={{tries}}>
+{% block css %}
+<link href="{{url_for('static', filename = 'css/hangman.css')}}" rel="stylesheet" />
+{% endblock css %}
 
-<div>
-{% for i in to_display %}
-    <span> {{i}} </span>
-{% endfor %}
+{% block bodyname %}
+<div class="sub_page">
+    {% endblock bodyname %}
+
+    {% block bodyname2 %}
+</div>
+{% endblock bodyname2 %}
+
+
+{% block body %}
+<div class="hangman-wrap">
+    <p class="hangman-title">Hangman</p>
+    <img src={{tries}}>
+
+    <div class="text-guess">
+        {% for i in to_display %}
+        <span> {{i}} </span>
+        {% endfor %}
+    </div>
+
+    <form class="hangman-form" action="{{ url_for('add_char') }}" method=post>
+        <div class="hangman-input-wrap">
+            <label class="hangman-label">Enter a letter:</label>
+            <div>
+                <input type="text" maxlength="1" name="letter">
+            </div>
+        </div>
+        <button class="hangman-btn" type="submit">Submit</button>
+    </form>
+    <div class="hangman-hints-wrap">
+        {% for i in word_set %}
+        <span class="hangman-hints">{{i}}</span>
+        {% endfor %}
+    </div>
 </div>
 
-<form action="{{ url_for('add_char') }}" method=post>
- <div>
- <label>Enter a letter:</label>
- <div>
-      <input type="text" maxlength="1" name="letter">
- </div>
- </div>
- <p><button type="submit">Submit</button></p>
-</form>
-<div>
- {% for i in word_set %}
-    <span>{{i}}</span>
- {% endfor %}
-</div>
-
-</body>
-</html> 
+{% endblock body %}

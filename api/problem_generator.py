@@ -1,6 +1,5 @@
 import random
 
-WORDFILE = "dictionary/countries.txt"
 easy = {'number of digits':2, 'operators':['+', '-'], 'number of problems':10}
 medium = {'number of digits':2, 'operators':['+', '-', '/', '*'], 'number of problems':10}
 medium_hard = {'number of digits':3, 'operators':['+', '-'], 'number of problems':10}
@@ -31,15 +30,3 @@ def generate_problems(level):
             b = result * a
         problems.append([a, b, op, result])
     return problems
-
-def get_random_word(WORDFILE):
-    """Get a random word from the wordlist using no extra memory."""
-    num_words_processed = 0
-    curr_word = None
-    with open(WORDFILE, 'r') as f:
-        for word in f:
-            word = word.strip().lower()
-            num_words_processed += 1
-            if random.randint(1, num_words_processed) == 1:
-                curr_word = word
-    return curr_word

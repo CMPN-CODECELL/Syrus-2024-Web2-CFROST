@@ -18,6 +18,7 @@
     <p class="profile-name">Name: {{username}}</p>
     <p class="profile-email">Email: {{useremail}}</p>
     <p class="profile-contact">Contact: {{usercontact}}</p>
+    <p class="profile-contact">Address: {{useraddress}}</p>
 
     <div class="globe">
         {{ plot_html_sudoku | safe }}
@@ -30,17 +31,24 @@
     <div class="globe">
         {{ plot_html_memory | safe }}
     </div>
+    <div class="globe">
+        {{ plot_html_maths | safe }}
+    </div>
 
-    <div class="profile-form-links">
+
+    <div class="profile-form-grid">
         <a class="profile-form-link-btn" href="/upload/notes">Upload Notes</a>
         <a class="profile-form-link-btn" href="/upload/details">Add Family Members</a>
         <a class="profile-form-link-btn" href="/upload/todo">Add To Do List</a>
-        <a class="profile-form-link-btn" href="/logout">Logout</a>
-    </div><br>
-    <div class="profile-form-links">
+        <a class="profile-form-link-btn" href="/upload/report">Upload Reports</a>
         <a class="profile-form-link-btn" href="/notes">View Notes</a>
         <a class="profile-form-link-btn" href="/family_details">View Family Members</a>
         <a class="profile-form-link-btn" href="/todo">View ToDo List</a>
+        <a class="profile-form-link-btn" href="/reports">View Reports</a>
+        <p></p>
+        <p></p>
+        <p></p>
+        <a class="profile-form-link-btn" href="/logout">Logout</a>
     </div>
 </div>
 {% endblock body %}
